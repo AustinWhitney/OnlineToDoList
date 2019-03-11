@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>SocketIO Client</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="index.js"></script>
+
+  </head>
+  <body onload="createTable()">
+  <script type ="text/javascript">
+  window.onload = function() {
+  createTable();
+};
+</script>
+
+  
+       <script type="text/javascript">
+       const express = require("express");
+
+const socketIO = require("socket.io");
+const path = require("path");
+var bodyParser = require('body-parser');
+var MongoClient = require('mongodb').MongoClient;
+ 
+// Configuration
+const PORT = process.env.PORT || 3000;
+const INDEX = path.join(__dirname, 'index.html');
+
+// Start server
+const server = express()
+  .use((req, res) => res.sendFile(INDEX) )
+ .listen(PORT, () => console.log("Listening on localhost:" + PORT));
+
+// Initiatlize SocketIO
+const io = socketIO(server);
+
+// Register "connection" events to the WebSocket
+io.on("connection", function(socket) {
+  // Register "join" events, requested by a connected client
+  socket.on("join", function (room) {
+    // join channel provided by client
+    socket.join(room)
+    // Register "image" events, sent by the client
+    socket.on("image", function(msg) {
+      // Broadcast the "image" event to all other clients in the room
+      socket.broadcast.to(room).emit("image", msg);
+    });
+  })
+});
+
+
+var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+var port = 3000;
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
+
+
+app.use("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
+
+
+
+
+// db instance connection
+
+const dbURI =
+  'mongodb+srv://Aust9n:MI3lYKW51cegs8yb@cluster0-on9lt.mongodb.net/nameSchema?retryWrites=true';
+
+const options = {
+  reconnectTries: Number.MAX_VALUE,
+  poolSize: 10,
+  useNewUrlParser:true,
+  keepAlive:1,
+  
+            
+};
+MongoClient.connect(dbURI,options, (err, client) => {
+  if (err) return console.log(err)
+  db = client.db() // whatever your database name is
+  app.listen(3000, () => {
+    console.log('listening on 3000')
+  })
+})
+
+app.get("/", (req, res) => {
+    res.sendFile(__dirname + "/index.html");
+    createTable();
+});
+
+
+        
+     
+
+    }
+
+    var socket = io();
+        var room = "test";
+      socket.emit("join", room);
+        tableCreate();
+//   app.post("/addname", function(req, res) {
+//   console.log(req.body.Action);
+//   var myobj = {Action:req.body.Action,DueDate:req.body.DueDate}
+//   db.collection('dbcollection').save(myobj, function(err, result) {
+//     if (err) return console.log(err)
+
+//     console.log('saved to database')
+//     res.redirect('/')
+//   })
+// })
+
+    </script>
+    <!-- File input and image output -->
+<form method="post" action="/addname"  >
+    <input type="text" name="Action" id="Action" placeholder="Type in the Action here.." required>
+    <input type="datetime-local" name="DueDate" id="DueDate"  required>
+    <input type="submit" value="Add Action">
+    <!-- Client Code -->
+    </form>
+    
+
+  </body>
+</html>
+
